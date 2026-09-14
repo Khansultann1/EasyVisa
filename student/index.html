@@ -44,12 +44,6 @@ button,.option{width:100%;border:1px solid #d0d5dd;background:#fff;padding:15px;
     <p class="small">Нәтиже — алдын ала бағдар. Виза мүмкіндігі құжаттар толық қаралғаннан кейін анықталады.</p>
   </div>
 
-  <div class="card qrbox">
-    <h2>🎓 Университеттегі QR</h2>
-    <p>Тест интернетке орналастырылғаннан кейін осы жерге тұрақты QR қойылады.</p>
-    <div id="qr"></div>
-    <div class="url" id="pageUrl"></div>
-  </div>
 </div>
 
 <script>
@@ -114,7 +108,6 @@ function finish(){
  const msg="Сәлеметсіз бе! Университеттегі NextVisa Student Test арқылы келдім.%0AМақсатым: "+encodeURIComponent(purpose)+".%0AБағытым: "+encodeURIComponent(destination)+".%0AНәтиже: "+encodeURIComponent(data[1])+".%0AТегін консультация алғым келеді.";
  document.getElementById('wa').href=WHATSAPP+"?text="+msg;
 }
-document.getElementById('pageUrl').textContent='NextVisa Student Test — QR will point to the deployed NextVisa URL';
 </script>
 </body>
 </html>
