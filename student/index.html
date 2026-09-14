@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NextVisa — Student Visa Test</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f7fb;color:#101828}
+.wrap{max-width:520px;margin:auto;padding:18px}
+.card{background:#fff;border-radius:24px;padding:24px;box-shadow:0 12px 40px rgba(16,24,40,.08);margin:14px 0}
+.logo{font-size:24px;font-weight:800;letter-spacing:-.7px}.logo span{font-weight:400}
+.badge{display:inline-block;background:#eef4ff;color:#155eef;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;margin:18px 0 10px}
+h1{font-size:30px;line-height:1.08;margin:8px 0 12px}p{color:#667085;line-height:1.5}
+.q{font-size:21px;font-weight:750;margin:20px 0 14px}.options{display:grid;gap:10px}
+button,.option{width:100%;border:1px solid #d0d5dd;background:#fff;padding:15px;border-radius:14px;text-align:left;font-size:16px;cursor:pointer}
+.option:hover{border-color:#155eef;background:#f8faff}.primary{background:#111827;color:#fff;border:0;text-align:center;font-weight:700}
+.progress{height:7px;background:#eaecf0;border-radius:20px;overflow:hidden}.bar{height:100%;width:20%;background:#155eef;transition:.25s}
+.result{text-align:center}.country{font-size:54px;margin:8px}.result h2{font-size:28px;margin:5px}.cta{display:block;text-decoration:none;background:#25d366;color:white;text-align:center;padding:16px;border-radius:14px;font-weight:800;margin-top:18px}
+.small{font-size:12px;color:#98a2b3;text-align:center}.hidden{display:none}
+.qrbox{text-align:center}.qrbox img{width:210px;height:210px;margin:10px auto}.url{font-size:11px;word-break:break-all;color:#667085}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="logo">Next<span>Visa</span></div>
+    <div class="badge">STUDENT VISA TEST</div>
+    <h1>30 секундта өзіңе сәйкес бағытты біл.</h1>
+    <p>5 қысқа сұраққа жауап бер. Соңында NextVisa маманы бастапқы бағыт бойынша тегін кеңес береді.</p>
+    <button class="primary" onclick="start()">Тестті бастау →</button>
+  </div>
+
+  <div class="card hidden" id="quiz">
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="q" id="question"></div>
+    <div class="options" id="options"></div>
+  </div>
+
+  <div class="card hidden result" id="result">
+    <div class="country" id="flag"></div>
+    <h2 id="country"></h2>
+    <p id="desc"></p>
+    <a class="cta" id="wa" target="_blank">WhatsApp арқылы тегін кеңес алу</a>
+    <p class="small">Нәтиже — алдын ала бағдар. Виза мүмкіндігі құжаттар толық қаралғаннан кейін анықталады.</p>
+  </div>
+
+  <div class="card qrbox">
+    <h2>🎓 Университеттегі QR</h2>
+    <p>Тест интернетке орналастырылғаннан кейін осы жерге тұрақты QR қойылады.</p>
+    <div id="qr"></div>
+    <div class="url" id="pageUrl"></div>
+  </div>
+</div>
+
+<script>
+const WHATSAPP = "https://wa.me/77714788264"; // NextVisa WhatsApp нөмірін осында қойыңыз
+
+const questions = [
+ {q:"Шетелге бару мақсатың қандай?",o:["✈️ Туризм","🎓 Оқу","💼 Жұмыс","👨‍👩‍👧 Туыстарға бару","💼 Бизнес"]},
+ {q:"Қай ел немесе бағыт саған қызық?",o:["🇰🇷 Корея","🇪🇺 Еуропа / Шенген","🇬🇧 Ұлыбритания","🇨🇦 Канада","🇺🇸 АҚШ","🇦🇺 Австралия","🌎 Әзірге білмеймін"]},
+ {q:"Қазір қандай статустасың?",o:["🎓 Студент","💼 Жұмыс істеймін","🎓 Студент әрі жұмыс істеймін","Басқа"]},
+ {q:"Шетелге бұрын шықтың ба?",o:["Иә, бірнеше рет","Иә, 1 рет","Жоқ"]},
+ {q:"Қайсысы саған маңыздырақ?",o:["💰 Қолжетімді бюджет","⚡ Жылдам дайындалу","🌎 Күшті елге бару","🎓 Оқу мүмкіндігі","💼 Заңды жұмыс мүмкіндігі"]}
+];
+let step=0, answers=[];
+
+function start(){
+ document.querySelector('.card').classList.add('hidden');
+ document.getElementById('quiz').classList.remove('hidden');
+ render();
+}
+function render(){
+ document.getElementById('question').textContent=questions[step].q;
+ document.getElementById('bar').style.width=((step+1)/questions.length*100)+'%';
+ const box=document.getElementById('options'); box.innerHTML='';
+ questions[step].o.forEach((x,i)=>{
+   const b=document.createElement('button'); b.className='option'; b.textContent=x;
+   b.onclick=()=>{answers.push(x); step++; step<questions.length?render():finish()};
+   box.appendChild(b);
+ });
+}
+function finish(){
+ const purpose=answers[0]||"";
+ const destination=answers[1]||"";
+ let data;
+
+ if(purpose.includes("Жұмыс")){
+   if(destination.includes("Корея")) data=["🇰🇷","Корея — жұмыс бағыты","Кореяда заңды жұмыс істеу үшін нақты бағдарлама мен талапты таңдау маңызды. NextVisa маманы сіздің жағдайыңызға сәйкес бағыттарды түсіндіреді."];
+   else if(destination.includes("Еуропа")) data=["🇪🇺","Еуропа — жұмыс бағыты","Еуропада жұмыс істеу үшін елге және жұмыс түріне қарай талаптар өзгереді. NextVisa маманы заңды бағыттарды түсіндіреді."];
+   else if(destination.includes("Ұлыбритания")) data=["🇬🇧","Ұлыбритания — жұмыс бағыты","Ұлыбританиядағы жұмыс мүмкіндіктері жұмыс берушіге, мамандыққа және рұқсат түріне байланысты. Жеке консультация қажет."];
+   else if(destination.includes("Канада")) data=["🇨🇦","Канада — жұмыс бағыты","Канадада жұмыс істеудің бірнеше заңды жолы бар. Сіздің тәжірибеңіз бен мақсатыңызға қарай сәйкес бағытты анықтауға болады."];
+   else if(destination.includes("АҚШ")) data=["🇺🇸","АҚШ — жұмыс бағыты","АҚШ-та жұмыс істеу үшін тиісті жұмыс рұқсаты/виза бағыты қажет. NextVisa маманы қолжетімді заңды нұсқаларды түсіндіреді."];
+   else if(destination.includes("Австралия")) data=["🇦🇺","Австралия — жұмыс бағыты","Австралиядағы жұмыс бағыттары мамандыққа, біліктілікке және бағдарлама талаптарына байланысты."];
+   else data=["💼","Шетелде жұмыс","Сізге шетелде заңды жұмыс істеу бағыты қызық. NextVisa маманы ел, мамандық және бағдарлама бойынша бастапқы бағытты анықтауға көмектеседі."];
+ } else if(purpose.includes("Оқу")){
+   if(destination.includes("Корея")) data=["🇰🇷","Корея — оқу бағыты","Кореяда оқу үшін оқу орны мен оқу бағдарламасына қарай виза талаптары анықталады."];
+   else if(destination.includes("Канада")) data=["🇨🇦","Канада — оқу бағыты","Канадада оқу бағыты оқу орнына, бағдарламаға және құжаттарға байланысты."];
+   else if(destination.includes("Ұлыбритания")) data=["🇬🇧","Ұлыбритания — оқу бағыты","Ұлыбританияда оқу үшін оқу бағдарламасы мен виза талаптарын алдын ала тексеру қажет."];
+   else data=["🎓","Шетелде оқу","Сізге оқу бағыты қызық. NextVisa маманы ел мен оқу мақсатыңызға қарай бастапқы талаптарды түсіндіреді."];
+ } else if(destination.includes("Корея")) data=["🇰🇷","Корея","Сіздің қызығушылығыңыз Корея бағытына сәйкес келеді."];
+ else if(destination.includes("Еуропа")) data=["🇪🇺","Шенген","Еуропа бағыты сізге қызық. Қай ел және қандай мақсат екенін нақтылап, талаптарды тексеруге болады."];
+ else if(destination.includes("Ұлыбритания")) data=["🇬🇧","Ұлыбритания","Ұлыбритания бағыты таңдалды. Жеке жағдайыңыз бойынша талаптарды маманмен тексеріңіз."];
+ else if(destination.includes("Канада")) data=["🇨🇦","Канада","Канада бағыты таңдалды. Құжаттар мен сапар мақсаты бойынша жеке бағалау қажет."];
+ else if(destination.includes("АҚШ")) data=["🇺🇸","АҚШ","АҚШ бағыты таңдалды. NextVisa маманы дайындық қадамдарын түсіндіреді."];
+ else if(destination.includes("Австралия")) data=["🇦🇺","Австралия","Австралия бағыты таңдалды. Сапар мақсатына қарай талаптар өзгереді."];
+ else data=["🌎","Сізге сәйкес бағыт","NextVisa маманы мақсатыңыз бен жағдайыңызға қарай бағыт таңдауға көмектеседі."];
+
+ document.getElementById('quiz').classList.add('hidden');
+ document.getElementById('result').classList.remove('hidden');
+ document.getElementById('flag').textContent=data[0];
+ document.getElementById('country').textContent=data[1];
+ document.getElementById('desc').textContent=data[2];
+
+ const msg="Сәлеметсіз бе! Университеттегі NextVisa Student Test арқылы келдім.%0AМақсатым: "+encodeURIComponent(purpose)+".%0AБағытым: "+encodeURIComponent(destination)+".%0AНәтиже: "+encodeURIComponent(data[1])+".%0AТегін консультация алғым келеді.";
+ document.getElementById('wa').href=WHATSAPP+"?text="+msg;
+}
+document.getElementById('pageUrl').textContent='NextVisa Student Test — QR will point to the deployed NextVisa URL';
+</script>
+</body>
+</html>
