@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id         Int      @id @default(autoincrement())
+  country    String
+  visaType   String
+  name       String
+  phone      String
+  telegramId BigInt?
+  city       String
+  status     String   @default("NEW")
+  note       String?
+  message    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  history ApplicationHistory[]
+}
+
+model ApplicationHistory {
+  id            Int         @id @default(autoincrement())
+  applicationId Int
+  status        String
+  createdAt     DateTime    @default(now())
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  name      String?
+  role      String   @default("MANAGER")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}

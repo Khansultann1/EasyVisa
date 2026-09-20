@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyVisa CRM</title>
+
+    <script>
+        (async function () {
+            try {
+                const response = await fetch("/api/auth/me", {
+                    credentials: "include"
+                });
+
+                const data = await response.json();
+
+                if (!data.logged) {
+                    window.location.href = "/login.html";
+                }
+            } catch (error) {
+                console.error("Auth check error:", error);
+                window.location.href = "/login.html";
+            }
+        })();
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container-fluid">
+
+<div class="row">
+<div class="col-md-2 bg-dark text-white vh-100 p-3">
+
+    <h3 class="mb-4">EasyVisa</h3>
+
+    <div class="list-group">
+
+        <a href="#" class="list-group-item list-group-item-action active">
+            📊 Dashboard
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action">
+            👥 Өтінімдер
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action">
+            🌍 Елдер
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action">
+            📈 Аналитика
+        </a>
+<a href="#"
+   class="list-group-item list-group-item-action"
+   onclick="showManagers(); return false;">
+    👤 Менеджерлер
+</a>
+        <a href="#" class="list-group-item list-group-item-action">
+            ⚙️ Баптаулар
+        </a>
+
+    </div>
+
+</div>
+
+<div class="col-md-10 p-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="mb-0">EasyVisa CRM</h2>
+        <small class="text-muted">
+            Визалық өтінімдерді басқару жүйесі
+        </small>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+
+    <button class="btn btn-outline-primary">
+        🔔 0
+    </button>
+
+    <a href="/api/auth/logout" class="btn btn-danger btn-sm">
+        🚪 Шығу
+    </a>
+
+    <div class="text-end">
+        <strong>Admin</strong><br>
+        <small class="text-muted">administrator</small>
+    </div>
+
+</div>
+
+</div>
+
+    <!-- Статистика -->
+<div class="row mb-4">
+
+    <!-- Барлығы -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center border-primary shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="total">0</h3>
+                <p class="mb-0">📊 Барлығы</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Жаңа -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center border-success shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="new">0</h3>
+                <p class="mb-0">🆕 Жаңа</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Қабылданды -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="accepted">0</h3>
+                <p class="mb-0">✅ Қабылданды</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Байланыстым -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="called">0</h3>
+                <p class="mb-0">📞 Байланыстым</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Төлем -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="paid">0</h3>
+                <p class="mb-0">💳 Төлем алды</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Құжат -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="documents">0</h3>
+                <p class="mb-0">📄 Құжат қабылданды</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Консулдық -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="submitted">0</h3>
+                <p class="mb-0">🏛️ Консулдықта</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Виза дайын -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="ready">0</h3>
+                <p class="mb-0">🎉 Виза дайын</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Бас тартты -->
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <h3 id="rejected">0</h3>
+                <p class="mb-0">❌ Бас тартты</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+    
+<div class="card mb-4">
+
+    <div class="card-header">
+        <strong>🆕 Соңғы өтінімдер</strong>
+    </div>
+
+    <div class="card-body">
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Аты</th>
+                    <th>Ел</th>
+                    <th>Статус</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="recentApplications">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+    <!-- Іздеу -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input
+                id="search"
+                class="form-control"
+                type="text"
+                placeholder="Аты, телефон немесе ел..."
+                onkeyup="loadApplications()">
+        </div>
+    </div>
+
+    <!-- Кесте -->
+    <table class="table table-bordered table-hover bg-white">
+
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Ел</th>
+                <th>Виза</th>
+                <th>Аты</th>
+                <th>Телефон</th>
+                <th>Қала</th>
+                <th>Статус</th>
+                <th>Әрекет</th>
+                <th>WhatsApp</th>
+            </tr>
+        </thead>
+
+        <tbody id="tbody">
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<script>
+
+let currentApplicationId = null;
+
+
+// =======================================
+// Өтінімді қарау
+// =======================================
+
+async function viewApplication(id) {
+
+    try {
+
+        const response = await fetch("/api/applications/" + id);
+
+        if (!response.ok) {
+            throw new Error("Өтінімді алу мүмкін болмады");
+        }
+
+        const app = await response.json();
+
+        currentApplicationId = app.id;
+
+        document.getElementById("applicationNote").value =
+            app.note || "";
+
+        document.getElementById("applicationInfo").innerHTML = `
+            <p><strong>ID:</strong> ${app.id}</p>
+            <p><strong>Ел:</strong> ${app.country}</p>
+            <p><strong>Виза:</strong> ${app.visaType}</p>
+            <p><strong>Аты:</strong> ${app.name}</p>
+            <p><strong>Телефон:</strong> ${app.phone}</p>
+            <p><strong>Қала:</strong> ${app.city}</p>
+            <p><strong>Статус:</strong> ${app.status}</p>
+            <p>
+                <strong>Құрылған күні:</strong>
+                ${new Date(app.createdAt).toLocaleString()}
+            </p>
+        `;
+
+        // Тарихты жүктеу
+        loadApplicationHistory(app.id);
+
+        const modalElement =
+            document.getElementById("applicationModal");
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(modalElement);
+
+        modal.show();
+
+    } catch (error) {
+
+        console.error("View application error:", error);
+
+        alert("❌ Өтінімді ашу кезінде қате шықты");
+    }
+}
+async function loadApplicationHistory(id) {
+
+    const container =
+        document.getElementById("applicationHistory");
+
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="text-muted">
+            ⏳ Жүктелуде...
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch(
+            `/api/applications/${id}/history`
+        );
+
+        if (!response.ok) {
+            throw new Error("History жүктелмеді");
+        }
+
+        const history = await response.json();
+
+        if (!history.length) {
+
+            container.innerHTML = `
+                <div class="alert alert-light">
+                    Тарих әзірге бос.
+                </div>
+            `;
+
+            return;
+        }
+
+        const statusText = {
+            NEW: "🆕 Жаңа өтінім",
+            ACCEPTED: "✅ Қабылданды",
+            CALLED: "📞 Менеджер байланысқа шықты",
+            PAID: "💳 Төлем қабылданды",
+            DOCUMENTS: "📄 Құжат қабылданды",
+            SUBMITTED: "🏛️ Консулдыққа тапсырылды",
+            READY: "🎉 Виза дайын",
+            REJECTED: "❌ Виза берілмеді"
+        };
+
+        container.innerHTML = history.map(item => {
+
+            return `
+                <div class="border rounded p-2 mb-2">
+
+                    <div>
+                        <strong>
+                            ${statusText[item.status] || item.status}
+                        </strong>
+                    </div>
+
+                    <small class="text-muted">
+                        ${new Date(item.createdAt).toLocaleString()}
+                    </small>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } catch (error) {
+
+        console.error("History error:", error);
+
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                ❌ Тарихты жүктеу мүмкін болмады
+            </div>
+        `;
+    }
+}
+
+
+// =======================================
+// Комментарий сақтау
+// =======================================
+
+async function saveNote() {
+
+    const note = document.getElementById("applicationNote").value;
+
+    const response = await fetch(
+        "/api/applications/" + currentApplicationId + "/note",
+        {
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                note: note
+            })
+        }
+    );
+
+    if (response.ok) {
+
+        alert("✅ Комментарий сақталды");
+
+    } else {
+
+        alert("❌ Қате шықты");
+
+    }
+}
+
+
+
+// =======================================
+// WhatsApp
+// =======================================
+
+function openWhatsApp(phone, name) {
+
+    phone = phone.replace(/\D/g, "");
+
+    if (phone.startsWith("8")) {
+        phone = "7" + phone.substring(1);
+    }
+
+    if (!phone.startsWith("7")) {
+        phone = "7" + phone;
+    }
+
+    const message =
+`Сәлеметсіз бе, ${name}!
+
+NextVisa визалық орталығынан хабарласып тұрмыз.
+
+Сіздің визалық өтініміңіз бойынша байланысқа шықтық.`;
+
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+    );
+}
+
+
+// =======================================
+// Соңғы өтінімдер
+// =======================================
+
+async function loadRecentApplications() {
+
+    const response = await fetch("/api/applications");
+
+    const applications = await response.json();
+
+    const tbody = document.getElementById("recentApplications");
+
+    tbody.innerHTML = "";
+
+    applications.slice(0, 5).forEach(app => {
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${app.id}</td>
+
+                <td>${app.name}</td>
+
+                <td>${app.country}</td>
+
+                <td>${app.status}</td>
+
+            </tr>
+        `;
+
+    });
+}
+
+
+// =======================================
+// Статистика
+// =======================================
+
+async function loadStats() {
+
+    try {
+
+        const response = await fetch(
+            "/api/applications/stats/summary"
+        );
+
+        if (!response.ok) {
+            throw new Error("Статистика жүктелмеді");
+        }
+
+        const stats = await response.json();
+
+        document.getElementById("total").innerText = stats.total;
+        document.getElementById("new").innerText = stats.newCount;
+
+        document.getElementById("accepted").innerText = stats.accepted;
+        document.getElementById("called").innerText = stats.called;
+        document.getElementById("paid").innerText = stats.paid;
+        document.getElementById("documents").innerText = stats.documents;
+        document.getElementById("submitted").innerText = stats.submitted;
+        document.getElementById("ready").innerText = stats.ready;
+        document.getElementById("rejected").innerText = stats.rejected;
+
+    } catch (error) {
+
+        console.error("❌ Stats error:", error);
+
+    }
+}
+
+
+// =======================================
+// Статус badge
+// =======================================
+
+function getStatusBadge(status) {
+
+    switch (status) {
+
+        case "NEW":
+            return '<span class="badge bg-primary">🆕 Жаңа</span>';
+
+        case "ACCEPTED":
+            return '<span class="badge bg-success">✅ Қабылданды</span>';
+
+        case "CALLED":
+            return '<span class="badge bg-info">📞 Байланыстым</span>';
+
+        case "PAID":
+            return '<span class="badge bg-primary">💳 Төлем алды</span>';
+
+        case "DOCUMENTS":
+            return '<span class="badge bg-warning text-dark">📄 Құжат қабылданды</span>';
+
+        case "SUBMITTED":
+            return '<span class="badge bg-secondary">🏛️ Консулдыққа тапсырылды</span>';
+
+        case "READY":
+            return '<span class="badge bg-success">🎉 Виза дайын</span>';
+
+        case "REJECTED":
+            return '<span class="badge bg-danger">❌ Бас тартты</span>';
+
+        default:
+            return '<span class="badge bg-light text-dark">' + status + '</span>';
+    }
+}
+
+
+// =======================================
+// Барлық өтінімдер
+// =======================================
+
+async function loadApplications() {
+
+    const response = await fetch("/api/applications");
+
+    const applications = await response.json();
+
+    const searchElement = document.getElementById("search");
+
+    const search = searchElement
+        ? searchElement.value.toLowerCase()
+        : "";
+
+    const tbody = document.getElementById("tbody");
+
+    tbody.innerHTML = "";
+
+    const filtered = applications.filter(app => {
+
+        return (
+            (app.name || "").toLowerCase().includes(search) ||
+            (app.phone || "").toLowerCase().includes(search) ||
+            (app.country || "").toLowerCase().includes(search) ||
+            (app.city || "").toLowerCase().includes(search) ||
+            (app.visaType || "").toLowerCase().includes(search) ||
+            (app.status || "").toLowerCase().includes(search)
+        );
+
+    });
+
+
+    filtered.forEach(app => {
+
+        tbody.innerHTML += `
+            <tr>
+
+                <td>${app.id}</td>
+
+                <td>${app.country}</td>
+
+                <td>${app.visaType}</td>
+
+                <td>${app.name}</td>
+
+                <td>${app.phone}</td>
+
+                <td>${app.city}</td>
+
+                <td>
+                    ${getStatusBadge(app.status)}
+                </td>
+
+                <td>
+
+                    <select
+                        class="form-select"
+                        onchange="changeStatus(${app.id}, this.value)">
+
+                        <option value="NEW" ${app.status === "NEW" ? "selected" : ""}>
+                            🆕 Жаңа
+                        </option>
+
+                        <option value="ACCEPTED" ${app.status === "ACCEPTED" ? "selected" : ""}>
+                            ✅ Қабылданды
+                        </option>
+
+                        <option value="CALLED" ${app.status === "CALLED" ? "selected" : ""}>
+                            📞 Байланыстым
+                        </option>
+
+                        <option value="PAID" ${app.status === "PAID" ? "selected" : ""}>
+                            💳 Төлем алды
+                        </option>
+
+                        <option value="DOCUMENTS" ${app.status === "DOCUMENTS" ? "selected" : ""}>
+                            📄 Құжат қабылданды
+                        </option>
+
+                        <option value="SUBMITTED" ${app.status === "SUBMITTED" ? "selected" : ""}>
+                            🏛️ Консулдыққа тапсырылды
+                        </option>
+
+                        <option value="READY" ${app.status === "READY" ? "selected" : ""}>
+                            🎉 Виза дайын
+                        </option>
+
+                        <option value="REJECTED" ${app.status === "REJECTED" ? "selected" : ""}>
+                            ❌ Бас тартты
+                        </option>
+
+                    </select>
+
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-primary btn-sm"
+                        onclick="viewApplication(${app.id})">
+
+                        Қарау
+
+                    </button>
+
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-success btn-sm"
+                        onclick="openWhatsApp('${app.phone}', '${app.name}')">
+
+                        💬 WhatsApp
+
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    });
+}
+
+
+// =======================================
+// Статусты өзгерту
+// =======================================
+
+async function changeStatus(id, status) {
+
+    try {
+
+        const response = await fetch(
+            "/api/applications/" + id + "/status",
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    status: status
+                })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Статус өзгермеді");
+        }
+
+        await loadApplications();
+        await loadStats();
+        await loadRecentApplications();
+
+    } catch (error) {
+
+        console.error("❌ Status change error:", error);
+
+    }
+}
+
+
+// =======================================
+// CRM іске қосылғанда
+// =======================================
+
+loadStats();
+loadApplications();
+loadRecentApplications();
+
+
+// =======================================
+// Әр 5 секунд сайын жаңарту
+// =======================================
+
+setInterval(() => {
+
+    loadStats();
+    loadApplications();
+    loadRecentApplications();
+
+}, 5000);
+
+</script>
+<div class="modal fade" id="applicationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Өтінім туралы ақпарат</h5>
+
+                <button
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body" id="applicationInfo">
+</div>
+
+<hr class="my-4">
+
+<h5>📋 Өтінім тарихы</h5>
+
+<div id="applicationHistory">
+    <p class="text-muted">Тарих жүктелуде...</p>
+</div>
+
+<div class="mt-3">
+    <label class="form-label">
+        📝 Менеджердің комментарийі
+    </label>
+
+    <textarea
+        id="applicationNote"
+        class="form-control"
+        rows="4"
+        placeholder="Комментарий жазыңыз..."></textarea>
+</div>
+
+<div class="mt-3 text-end">
+    <button
+        class="btn btn-success"
+        onclick="saveNote()">
+        💾 Сақтау
+    </button>
+</div>
+        </div>
+    </div>
+</div>
+</div>
+        </div>
+    </div>
+</div>
+
+<!-- МЕНЕДЖЕРЛЕР БӨЛІМІ -->
+<div id="managersSection" style="display:none;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>👤 Менеджерлер</h2>
+            <p class="text-muted mb-0">
+                EasyVisa менеджерлерін басқару
+            </p>
+        </div>
+
+        <button
+            class="btn btn-primary"
+            onclick="openAddManagerModal()">
+            ➕ Менеджер қосу
+        </button>
+
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Аты</th>
+                            <th>Username</th>
+                            <th>Рөлі</th>
+                            <th>Статус</th>
+                            <th>Әрекет</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="managersTableBody">
+                        <tr>
+                            <td colspan="6"
+                                class="text-center text-muted">
+                                Жүктелуде...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</div>
+</div>
+
+<script>
+
+
+</script>
+
+
+   
+   
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+</div>
+</div>
+
+</script>
+
+<script>
+
+function showManagers() {
+
+    const section = document.getElementById("managersSection");
+
+    if (!section) {
+        console.error("❌ managersSection табылмады");
+        return;
+    }
+
+    section.style.display = "block";
+
+    section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    loadManagers();
+}
+
+
+async function loadManagers() {
+
+    const tbody = document.getElementById("managersTableBody");
+
+    if (!tbody) {
+        console.error("❌ managersTableBody табылмады");
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/api/admin/managers");
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                "❌ " +
+                (data.error || "Менеджерлерді алу мүмкін болмады")
+            );
+
+            return;
+        }
+
+        tbody.innerHTML = "";
+
+        data.forEach(manager => {
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>#${manager.id}</td>
+
+                <td>
+                    ${manager.name || "-"}
+                </td>
+
+                <td>
+                    ${manager.username}
+                </td>
+
+                <td>
+                    ${manager.role}
+                </td>
+
+                <td>
+                    ${
+                        manager.isActive
+                            ? '<span class="badge bg-success">🟢 Белсенді</span>'
+                            : '<span class="badge bg-secondary">🔴 Өшірулі</span>'
+                    }
+                </td>
+
+                <td>
+
+                    ${
+                        manager.role === "ADMIN"
+
+                            ? `
+                                <span class="text-muted">
+                                    🔒 Негізгі Admin
+                                </span>
+                              `
+
+                            : `
+
+                                <button
+                                    class="btn btn-sm ${
+                                        manager.isActive
+                                            ? "btn-warning"
+                                            : "btn-success"
+                                    } me-1"
+                                    onclick="toggleManager(${manager.id})">
+
+                                    ${
+                                        manager.isActive
+                                            ? "🔴 Өшіру"
+                                            : "🟢 Қосу"
+                                    }
+
+                                </button>
+
+                                <button
+                                    class="btn btn-sm btn-danger"
+                                    onclick="deleteManager(
+                                        ${manager.id},
+                                        '${manager.username}'
+                                    )">
+
+                                    🗑️ Жою
+
+                                </button>
+
+                              `
+                    }
+
+                </td>
+            `;
+
+            tbody.appendChild(row);
+
+        });
+
+    } catch (error) {
+
+        console.error("❌ Managers load error:", error);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    class="text-center text-danger">
+
+                    ❌ Менеджерлерді жүктеу мүмкін болмады
+
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+async function toggleManager(id) {
+
+    try {
+
+        const response = await fetch(
+            `/api/admin/managers/${id}/toggle`,
+            {
+                method: "PUT"
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                "❌ " +
+                (data.error || "Қате шықты")
+            );
+
+            return;
+        }
+
+        await loadManagers();
+
+    } catch (error) {
+
+        console.error(
+            "❌ Toggle manager error:",
+            error
+        );
+
+        alert("❌ Сервермен байланыс қатесі");
+    }
+}
+
+
+async function deleteManager(id, username) {
+
+    const confirmed = confirm(
+        `⚠️ ${username} менеджерін шынымен өшіргіңіз келе ме?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/api/admin/managers/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(
+                "❌ " +
+                (data.error ||
+                "Менеджерді өшіру мүмкін болмады")
+            );
+
+            return;
+        }
+
+        alert("✅ Менеджер өшірілді");
+
+        await loadManagers();
+
+    } catch (error) {
+
+        console.error(
+            "❌ Delete manager error:",
+            error
+        );
+
+        alert("❌ Сервермен байланыс қатесі");
+    }
+}
+
+
+function openAddManagerModal() {
+
+    const modalElement =
+        document.getElementById("addManagerModal");
+
+    if (!modalElement) {
+        console.error("❌ addManagerModal табылмады");
+        return;
+    }
+
+    const modal =
+        new bootstrap.Modal(modalElement);
+
+    modal.show();
+}
+
+
+async function createManager() {
+
+    const name =
+        document.getElementById("managerName")
+            .value
+            .trim();
+
+    const username =
+        document.getElementById("managerUsername")
+            .value
+            .trim();
+
+    const password =
+        document.getElementById("managerPassword")
+            .value;
+
+    const role =
+        document.getElementById("managerRole")
+            .value;
+
+
+    if (!username || !password) {
+
+        alert(
+            "❌ Username және пароль міндетті"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            "/api/admin/managers",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    name,
+                    username,
+                    password,
+                    role
+
+                })
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                "❌ " +
+                (
+                    data.error ||
+                    "Менеджер қосылмады"
+                )
+            );
+
+            return;
+        }
+
+
+        alert(
+            "✅ Менеджер сәтті қосылды"
+        );
+
+
+        const modalElement =
+            document.getElementById(
+                "addManagerModal"
+            );
+
+
+        const modal =
+            bootstrap.Modal.getInstance(
+                modalElement
+            );
+
+
+        if (modal) {
+            modal.hide();
+        }
+
+
+        document.getElementById(
+            "managerName"
+        ).value = "";
+
+        document.getElementById(
+            "managerUsername"
+        ).value = "";
+
+        document.getElementById(
+            "managerPassword"
+        ).value = "";
+
+
+        await loadManagers();
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Create manager error:",
+            error
+        );
+
+        alert(
+            "❌ Сервермен байланыс қатесі"
+        );
+    }
+}
+
+
+</script>
+
+</script>
+</body>
+</html>
