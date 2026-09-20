@@ -30,7 +30,7 @@ router.post("/login", async (req, res) => {
             }
         });
 
-        if (!admin) {
+       if (!admin || !admin.isActive) {
             return res.status(401).json({
                 success: false,
                 message: "Логин немесе пароль қате"

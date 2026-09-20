@@ -91,8 +91,8 @@
     </a>
 
     <div class="text-end">
-        <strong>Admin</strong><br>
-        <small class="text-muted">administrator</small>
+        <strong id="currentUserName">Жүктелуде...</strong><br>
+        <small id="currentUserRole" class="text-muted"></small>
     </div>
 
 </div>
@@ -1262,5 +1262,101 @@ async function createManager() {
 </script>
 
 </script>
+<!-- ADD MANAGER MODAL -->
+<div class="modal fade" id="addManagerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">➕ Менеджер қосу</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Аты</label>
+                    <input type="text" id="managerName" class="form-control" placeholder="Менеджер аты">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="managerUsername" class="form-control" placeholder="Username">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Пароль</label>
+                    <input type="password" id="managerPassword" class="form-control" placeholder="Пароль">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Рөлі</label>
+                    <select id="managerRole" class="form-select">
+                        <option value="MANAGER">Менеджер</option>
+                        <option value="ADMIN">Администратор</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Болдырмау
+                </button>
+                <button type="button" class="btn btn-primary" onclick="createManager()">
+                    💾 Сақтау
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(async function () {
+    try {
+        const response = await fetch("/api/auth/me", {
+            credentials: "include"
+        });
+
+        const data = await response.json();
+
+        if (!data.logged) {
+            window.location.href = "/login.html";
+            return;
+        }
+
+        const name = document.getElementById("currentUserName");
+        const role = document.getElementById("currentUserRole");
+
+        if (name) {
+            name.textContent =
+                data.user.name || data.user.username;
+        }
+
+        if (role) {
+            role.textContent =
+                data.user.role === "ADMIN"
+                    ? "administrator"
+                    : "manager";
+        }
+
+        if (data.user.role !== "ADMIN") {
+            document
+                .querySelectorAll('[onclick*="showManagers"]')
+                .forEach(function (el) {
+                    el.style.display = "none";
+                });
+
+            const section =
+                document.getElementById("managersSection");
+
+            if (section) {
+                section.style.display = "none";
+            }
+        }
+
+    } catch (error) {
+        console.error("User role error:", error);
+    }
+})();
+</script>
+
 </body>
 </html>

@@ -79,7 +79,8 @@ router.post("/managers", async (req, res) => {
         const {
             username,
             password,
-            name
+            name,
+            role
         } = req.body;
 
         if (!username || !password) {
@@ -94,6 +95,10 @@ router.post("/managers", async (req, res) => {
             return res.status(400).json({
                 error: "Пароль кемінде 6 таңба болуы керек"
             });
+        }
+
+        if (!["MANAGER", "ADMIN"].includes(role)) {
+            return res.status(400).json({ error: "Invalid role" });
         }
 
         const existingManager =
@@ -119,7 +124,7 @@ router.post("/managers", async (req, res) => {
                     username: username.trim(),
                     password: hashedPassword,
                     name: name || null,
-                    role: "MANAGER",
+                    role,
                     isActive: true
                 },
                 select: {
