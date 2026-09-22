@@ -15,6 +15,16 @@ function requireAuth(req, res, next) {
     next();
 }
 
+
+function requireAdmin(req, res, next) {
+    const role = String(req.session?.user?.role || "").toUpperCase();
+
+    if (role !== "ADMIN") {
+        return res.status(403).json({ error: "Forbidden: admin role required" });
+    }
+
+    next();
+}
 router.use(requireAuth);
 // =======================================
 // Барлық өтінімдер
@@ -158,7 +168,7 @@ router.get("/:id", async (req, res) => {
 // Статусты өзгерту
 // PUT /api/applications/:id/status
 // =======================================
-router.put("/:id/status", async (req, res) => {
+router.put("/:id/status", requireAdmin, async (req, res) => {
     try {
         const id = Number(req.params.id);
         const { status } = req.body;

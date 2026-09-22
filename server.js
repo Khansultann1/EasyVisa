@@ -516,6 +516,11 @@ bot.on("callback_query", async (query) => {
     const [status, id] = data.split("_");
     const chatId = query.message.chat.id;
     const messageId = query.message.message_id;
+
+    if (chatId !== ADMIN_ID) {
+        await bot.answerCallbackQuery(query.id, { text: "Only ADMIN can change status", show_alert: true });
+        return;
+    }
     let newStatus = "";
 
     switch (status) {
@@ -564,7 +569,14 @@ bot.on("callback_query", async (query) => {
     await bot.answerCallbackQuery(query.id, {
         text: "Статус жаңартылды ✅"
     });
-const application = await prisma.application.findUnique({
+await prisma.applicationHistory.create({
+        data: {
+            applicationId: Number(id),
+            status: newStatus
+        }
+    });
+
+    const application = await prisma.application.findUnique({
     where: {
         id: Number(id)
     }
