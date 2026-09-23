@@ -25,11 +25,13 @@ function requireAdmin(req, res, next) {
 
     next();
 }
-router.use(requireAuth);
+// CRM API authentication is applied after the public application submission route.
 // =======================================
 // Барлық өтінімдер
 // GET /api/applications
 // =======================================
+
+
 router.get("/", async (req, res) => {
     try {
         const applications = await prisma.application.findMany({
@@ -270,6 +272,7 @@ router.get("/:id/history", async (req, res) => {
 // Сайттан жаңа өтінім
 // POST /api/applications
 // =======================================
+
 router.post("/", async (req, res) => {
     try {
 
@@ -293,6 +296,8 @@ router.post("/", async (req, res) => {
         status: "NEW"
     }
 });
+
+router.use(requireAuth);
 
 try {
 
