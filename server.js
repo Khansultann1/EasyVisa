@@ -24,11 +24,13 @@ const adminRoutes = require("./routes/admin");
 app.use(express.json());
 app.use(express.static(__dirname));
 app.use(session({
-    secret: "easyvisa_secret_key",
+    secret: process.env.SESSION_SECRET || "easyvisa_dev_secret_change_me",
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production"
     }
 }));
 const applicationRoutes = require("./routes/applications");
@@ -500,8 +502,12 @@ app.get("/login", (req, res) => {
 });
 app.get("/admin", (req, res) => {
 
-    if (!req.session.user) {
+    if (!req.session?.user) {
         return res.redirect("/login");
+    }
+
+    if (String(req.session.user.role || "").toUpperCase() !== "ADMIN") {
+        return res.status(403).send("Forbidden");
     }
 
     res.sendFile(__dirname + "/admin/index.html");
