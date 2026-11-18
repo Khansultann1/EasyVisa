@@ -66,6 +66,7 @@ const createDisabledBot = (label) => ({
 });
 const clientToken = process.env.BOT_TOKEN;
 const managerToken = process.env.MANAGER_BOT_TOKEN;
+const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
 // If both env vars accidentally contain the same token, create only ONE polling
 // instance and attach manager callbacks to that same bot.
@@ -106,7 +107,6 @@ for (const entry of pollingBots) {
         });
     }
 }
-const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
 // Help the administrator verify the manager bot's chat ID directly.
 if (managerBot !== bot) {
