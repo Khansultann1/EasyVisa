@@ -56,7 +56,7 @@ if (form) {
         }
 
         try {
-            const response = await fetch("/api/applications", {
+            const response = await fetch("https://nextvisa-api.onrender.com/api/applications", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
