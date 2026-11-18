@@ -4,7 +4,9 @@ const whatsappNumber = "77714788264";
 
 function openWhatsApp(message) {
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    // Navigate in the current tab. window.open() after an awaited fetch is commonly
+    // blocked by mobile and Instagram in-app browsers as an unsolicited popup.
+    window.location.assign(url);
 }
 
 if (chatBtn && chat) {
@@ -71,11 +73,10 @@ if (form) {
 
             if (!response.ok) throw new Error("Application API unavailable");
 
-            alert("Өтінім қабылданды. WhatsApp арқылы хабарламаңызды да жібере аласыз.");
-            openWhatsApp(whatsappMessage);
             form.reset();
+            alert("Өтінім қабылданды. WhatsApp ашылады — хабарламаңызды жіберу үшін Send батырмасын басыңыз.");
+            openWhatsApp(whatsappMessage);
         } catch (error) {
-            // Keep the lead path usable if the static website cannot reach its CRM API.
             const proceed = window.confirm(
                 "Сайттың өтінім сервері қазір жауап бермеді. Өтінімді WhatsApp арқылы жіберейік пе?"
             );
