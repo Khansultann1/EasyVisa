@@ -22,6 +22,21 @@ const app = express();
 const adminRoutes = require("./routes/admin");
 
 app.use(express.json());
+
+// Allow the public Netlify website to submit leads to this API.
+app.use("/api/applications", (req, res, next) => {
+    const allowedOrigin = "https://nextvis.netlify.app";
+    const origin = req.headers.origin;
+    if (origin === allowedOrigin) {
+        res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+        res.setHeader("Vary", "Origin");
+        res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+    if (req.method === "OPTIONS") return res.sendStatus(origin === allowedOrigin ? 204 : 403);
+    next();
+});
+
 app.use(express.static(__dirname));
 if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
     throw new Error("SESSION_SECRET must be configured in production");
