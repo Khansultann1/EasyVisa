@@ -42,15 +42,19 @@ const applicationRoutes = require("./routes/applications");
 app.use("/api/applications", applicationRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+const createDisabledBot = (label) => ({
+    onText() {},
+    on() {},
+    async sendMessage() { throw new Error(`${label} is not configured`); },
+    async answerCallbackQuery() {},
+    async editMessageText() {}
+});
 const bot = process.env.BOT_TOKEN
     ? new TelegramBot(process.env.BOT_TOKEN, { polling: true })
-    : {
-        onText() {},
-        on() {},
-        async sendMessage() { throw new Error("BOT_TOKEN is not configured"); },
-        async answerCallbackQuery() {},
-        async editMessageText() {}
-    };
+    : createDisabledBot("BOT_TOKEN");
+const managerBot = process.env.MANAGER_BOT_TOKEN
+    ? new TelegramBot(process.env.MANAGER_BOT_TOKEN, { polling: true })
+    : createDisabledBot("MANAGER_BOT_TOKEN");
 const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
 if (!process.env.BOT_TOKEN) console.warn("Client Telegram bot disabled: BOT_TOKEN is not configured");
@@ -530,7 +534,7 @@ app.get("/admin", (req, res) => {
     res.sendFile(__dirname + "/admin/index.html");
 
 });
-bot.on("callback_query", async (query) => {
+managerBot.on("callback_query", async (query) => {
 
     console.log("BUTTON PRESSED");
     console.log(query);
@@ -541,7 +545,7 @@ bot.on("callback_query", async (query) => {
     const messageId = query.message.message_id;
 
     if (chatId !== ADMIN_ID) {
-        await bot.answerCallbackQuery(query.id, { text: "Only ADMIN can change status", show_alert: true });
+        await managerBot.answerCallbackQuery(query.id, { text: "Only ADMIN can change status", show_alert: true });
         return;
     }
     let newStatus = "";
@@ -589,7 +593,7 @@ bot.on("callback_query", async (query) => {
         }
     });
 
-    await bot.answerCallbackQuery(query.id, {
+    await managerBot.answerCallbackQuery(query.id, {
         text: "Статус жаңартылды ✅"
     });
 await prisma.applicationHistory.create({
@@ -605,7 +609,7 @@ await prisma.applicationHistory.create({
     }
 });
 
-await bot.editMessageText(
+await managerBot.editMessageText(
 `🆕 ЖАҢА ӨТІНІМ
 
 👤 ${application.name}
