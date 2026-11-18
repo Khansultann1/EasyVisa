@@ -6,7 +6,7 @@ services:
     region: singapore
     branch: main
     buildCommand: npm install && npx prisma generate
-    startCommand: npm start
+    startCommand: npx prisma migrate deploy && npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
