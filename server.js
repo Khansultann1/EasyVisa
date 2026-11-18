@@ -80,19 +80,27 @@ if (sameTelegramBot) {
     console.warn("BOT_TOKEN and MANAGER_BOT_TOKEN are identical; using one Telegram polling instance.");
 }
 
-// Prevent Telegram 409 polling conflicts from flooding logs indefinitely.
-// A conflict indicates another active poller is using the same bot token;
-// the instance stops polling so the owner can resolve the duplicate.
-const pollingBots = [...new Set([bot, managerBot])];
-for (const pollingBot of pollingBots) {
-    if (typeof pollingBot.on === "function") {
-        pollingBot.on("polling_error", (error) => {
+// Log polling errors with bot labels so the conflicting token can be identified.
+// Stop only the polling instance that received a 409 conflict.
+const pollingBots = [
+    { label: "CLIENT_BOT", instance: bot },
+    { label: "MANAGER_BOT", instance: managerBot }
+].filter((entry, index, list) => list.findIndex(item => item.instance === entry.instance) === index);
+console.log("Telegram bot startup:", {
+    clientConfigured: Boolean(clientToken),
+    managerConfigured: Boolean(managerToken),
+    adminConfigured: Boolean(ADMIN_ID),
+    sameToken: sameTelegramBot
+});
+for (const entry of pollingBots) {
+    if (typeof entry.instance.on === "function") {
+        entry.instance.on("polling_error", (error) => {
             const code = error?.response?.body?.error_code;
             const message = error?.response?.body?.description || error.message;
-            console.error("Telegram polling error:", code || "unknown", message);
-            if (code === 409 && typeof pollingBot.stopPolling === "function") {
-                pollingBot.stopPolling().catch(stopError =>
-                    console.error("Unable to stop conflicted Telegram polling:", stopError.message)
+            console.error(`[${entry.label}] Telegram polling error:`, code || "unknown", message);
+            if (code === 409 && typeof entry.instance.stopPolling === "function") {
+                entry.instance.stopPolling().catch(stopError =>
+                    console.error(`[${entry.label}] Unable to stop conflicted polling:`, stopError.message)
                 );
             }
         });
