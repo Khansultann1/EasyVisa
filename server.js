@@ -23,8 +23,12 @@ const adminRoutes = require("./routes/admin");
 
 app.use(express.json());
 app.use(express.static(__dirname));
+if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET must be configured in production");
+}
+app.set("trust proxy", 1);
 app.use(session({
-    secret: process.env.SESSION_SECRET || "easyvisa_dev_secret_change_me",
+    secret: process.env.SESSION_SECRET || "local-development-only-change-this-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -38,12 +42,19 @@ const applicationRoutes = require("./routes/applications");
 app.use("/api/applications", applicationRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-const bot = new TelegramBot(process.env.BOT_TOKEN, {
-    polling: true,
-});
-const ADMIN_ID = Number(process.env.ADMIN_ID) || 7369655231;
+const bot = process.env.BOT_TOKEN
+    ? new TelegramBot(process.env.BOT_TOKEN, { polling: true })
+    : {
+        onText() {},
+        on() {},
+        async sendMessage() { throw new Error("BOT_TOKEN is not configured"); },
+        async answerCallbackQuery() {},
+        async editMessageText() {}
+    };
+const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
-console.log("ADMIN_ID =", ADMIN_ID);
+if (!process.env.BOT_TOKEN) console.warn("Client Telegram bot disabled: BOT_TOKEN is not configured");
+if (!process.env.MANAGER_BOT_TOKEN || !ADMIN_ID) console.warn("Manager notifications disabled: configure MANAGER_BOT_TOKEN and ADMIN_ID");
 const userState = {};
 
 bot.onText(/\/start/, (msg) => {
@@ -393,8 +404,6 @@ if (msg.text === "📝 Өтінім беру") {
     console.log(data);
 console.log("Country:", data.country);
            const info = countries[data.country];
-console.log("MANAGER TOKEN:", process.env.MANAGER_BOT_TOKEN);
-console.log("ADMIN_ID:", process.env.ADMIN_ID);
 const text =
 `🆕 ЖАҢА ӨТІНІМ
 
@@ -407,8 +416,6 @@ const text =
 console.log("Жіберілетін хабарлама:");
 console.log(text);
             try {
-console.log("MANAGER_BOT_TOKEN:", process.env.MANAGER_BOT_TOKEN);
-console.log("ADMIN_ID:", process.env.ADMIN_ID);
     const result =await axios.post(
     `https://api.telegram.org/bot${process.env.MANAGER_BOT_TOKEN}/sendMessage`,
     {
@@ -490,6 +497,16 @@ if (msg.text === "🏠 Басты мәзір") {
         return showMainMenu(bot, chatId);
     }
 
+});
+
+app.get("/health", async (req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.json({ status: "ok", database: "connected" });
+    } catch (error) {
+        console.error("Health check database error:", error.message);
+        res.status(503).json({ status: "error", database: "unavailable" });
+    }
 });
 
 app.get("/", (req, res) => {
