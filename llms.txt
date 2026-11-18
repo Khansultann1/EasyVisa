@@ -1,0 +1,20 @@
+# NextVisa
+
+NextVisa provides visa application guidance and document-preparation assistance for people applying from Kazakhstan.
+
+Website: https://nextvis.netlify.app/
+Service area: Kazakhstan. The website lists Shymkent as the contact city.
+Phone / WhatsApp: +7 771 478 82 64
+
+## Visa directions listed on the website
+- United States
+- Schengen area
+- United Kingdom
+- Canada
+- Australia
+- South Korea
+- Japan
+
+NextVisa is a private visa-assistance service, not a government authority or embassy. Visa decisions are made by the relevant government or consular authority. Requirements, fees, processing times and eligibility vary by country and applicant. No visa approval is guaranteed.
+
+Applicants should confirm current rules using the relevant official government or consular website.
