@@ -72,10 +72,10 @@ const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 // instance and attach manager callbacks to that same bot.
 const sameTelegramBot = Boolean(clientToken && managerToken && clientToken === managerToken);
 const bot = clientToken
-    ? new TelegramBot(clientToken, { polling: true })
+    ? new TelegramBot(clientToken, { polling: false })
     : createDisabledBot("BOT_TOKEN");
 const managerBot = managerToken
-    ? (sameTelegramBot ? bot : new TelegramBot(managerToken, { polling: true }))
+    ? (sameTelegramBot ? bot : new TelegramBot(managerToken, { polling: false }))
     : createDisabledBot("MANAGER_BOT_TOKEN");
 if (sameTelegramBot) {
     console.warn("BOT_TOKEN and MANAGER_BOT_TOKEN are identical; using one Telegram polling instance.");
@@ -735,6 +735,28 @@ await managerBot.editMessageText(
 }
 );
 });
+let telegramPollingStarted = false;
+const startTelegramPollingOnce = async () => {
+    if (telegramPollingStarted) {
+        console.warn("Telegram polling startup skipped: already started in this process");
+        return;
+    }
+    telegramPollingStarted = true;
+    for (const entry of pollingBots) {
+        if (typeof entry.instance.startPolling !== "function") continue;
+        try {
+            await entry.instance.startPolling();
+            console.log(`[${entry.label}] polling started (single startup path)`);
+        } catch (error) {
+            telegramPollingStarted = false;
+            console.error(`[${entry.label}] polling startup failed:`, error.message);
+        }
+    }
+};
+
 app.listen(PORT, () => {
     console.log(`Server started: ${PORT}`);
+    startTelegramPollingOnce().catch(error => {
+        console.error("Telegram polling startup error:", error.message);
+    });
 });
