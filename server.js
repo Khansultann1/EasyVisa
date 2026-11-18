@@ -64,12 +64,21 @@ const createDisabledBot = (label) => ({
     async answerCallbackQuery() {},
     async editMessageText() {}
 });
-const bot = process.env.BOT_TOKEN
-    ? new TelegramBot(process.env.BOT_TOKEN, { polling: true })
+const clientToken = process.env.BOT_TOKEN;
+const managerToken = process.env.MANAGER_BOT_TOKEN;
+
+// If both env vars accidentally contain the same token, create only ONE polling
+// instance and attach manager callbacks to that same bot.
+const sameTelegramBot = Boolean(clientToken && managerToken && clientToken === managerToken);
+const bot = clientToken
+    ? new TelegramBot(clientToken, { polling: true })
     : createDisabledBot("BOT_TOKEN");
-const managerBot = process.env.MANAGER_BOT_TOKEN
-    ? new TelegramBot(process.env.MANAGER_BOT_TOKEN, { polling: true })
+const managerBot = managerToken
+    ? (sameTelegramBot ? bot : new TelegramBot(managerToken, { polling: true }))
     : createDisabledBot("MANAGER_BOT_TOKEN");
+if (sameTelegramBot) {
+    console.warn("BOT_TOKEN and MANAGER_BOT_TOKEN are identical; using one Telegram polling instance.");
+}
 const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
 if (!process.env.BOT_TOKEN) console.warn("Client Telegram bot disabled: BOT_TOKEN is not configured");
