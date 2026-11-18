@@ -79,6 +79,25 @@ const managerBot = managerToken
 if (sameTelegramBot) {
     console.warn("BOT_TOKEN and MANAGER_BOT_TOKEN are identical; using one Telegram polling instance.");
 }
+
+// Prevent Telegram 409 polling conflicts from flooding logs indefinitely.
+// A conflict indicates another active poller is using the same bot token;
+// the instance stops polling so the owner can resolve the duplicate.
+const pollingBots = [...new Set([bot, managerBot])];
+for (const pollingBot of pollingBots) {
+    if (typeof pollingBot.on === "function") {
+        pollingBot.on("polling_error", (error) => {
+            const code = error?.response?.body?.error_code;
+            const message = error?.response?.body?.description || error.message;
+            console.error("Telegram polling error:", code || "unknown", message);
+            if (code === 409 && typeof pollingBot.stopPolling === "function") {
+                pollingBot.stopPolling().catch(stopError =>
+                    console.error("Unable to stop conflicted Telegram polling:", stopError.message)
+                );
+            }
+        });
+    }
+}
 const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
 if (!process.env.BOT_TOKEN) console.warn("Client Telegram bot disabled: BOT_TOKEN is not configured");
