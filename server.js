@@ -110,10 +110,10 @@ for (const entry of pollingBots) {
 
 // Help the administrator verify the manager bot's chat ID directly.
 if (managerBot !== bot) {
-    managerBot.onText(/\\/start/, (msg) => {
+    managerBot.onText(/\/start/, (msg) => {
         managerBot.sendMessage(msg.chat.id, "NextVisa менеджер боты қосылды. Chat ID алу үшін /id жіберіңіз.");
     });
-    managerBot.onText(/\\/id/, (msg) => {
+    managerBot.onText(/\/id/, (msg) => {
         managerBot.sendMessage(msg.chat.id, `Chat ID: ${msg.chat.id}`);
     });
 }
