@@ -100,6 +100,16 @@ for (const pollingBot of pollingBots) {
 }
 const ADMIN_ID = Number(process.env.ADMIN_ID) || 0;
 
+// Help the administrator verify the manager bot's chat ID directly.
+if (managerBot !== bot) {
+    managerBot.onText(/\\/start/, (msg) => {
+        managerBot.sendMessage(msg.chat.id, "NextVisa менеджер боты қосылды. Chat ID алу үшін /id жіберіңіз.");
+    });
+    managerBot.onText(/\\/id/, (msg) => {
+        managerBot.sendMessage(msg.chat.id, `Chat ID: ${msg.chat.id}`);
+    });
+}
+
 if (!process.env.BOT_TOKEN) console.warn("Client Telegram bot disabled: BOT_TOKEN is not configured");
 if (!process.env.MANAGER_BOT_TOKEN || !ADMIN_ID) console.warn("Manager notifications disabled: configure MANAGER_BOT_TOKEN and ADMIN_ID");
 const userState = {};
